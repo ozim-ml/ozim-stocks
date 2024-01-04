@@ -5,6 +5,4 @@ yfinance
 matplotlib
 seaborn
 statsmodels
-arch
-numpy
 
