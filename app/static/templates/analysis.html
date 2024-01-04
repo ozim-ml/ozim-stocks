@@ -1,0 +1,42 @@
+<!-- static/templates/analysis.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Stock Analysis</title>
+    <link rel="icon" href="{{ url_for('static', path='/images/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
+    <style>
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .plot {
+            flex: 1;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Stock Analysis for {{ ticker }}</h1>
+
+    <div class="container">
+        <div class="plot">
+            <h2>Adjusted close</h2>
+            <img src="data:image/png;base64,{{ plot_adj_close }}" alt="Adj Close Plot">
+        </div>
+
+        <div class="plot">
+            <h2>Daily returns</h2>
+            <img src="data:image/png;base64,{{ plot_daily_returns }}" alt="Daily Returns Plot">
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="plot">
+            <h2>ACF of squared daily returns</h2>
+            <img src="data:image/png;base64,{{ plot_acf }}" alt="ACF of Squared Daily Returns Plot">
+        </div>
+    </div>
+</body>
+</html>

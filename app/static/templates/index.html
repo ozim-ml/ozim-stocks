@@ -1,0 +1,24 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Stock analysis</title>
+    <link rel="icon" href="{{ url_for('static', path='/images/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
+</head>
+<body>
+    <h1>Stock analysis</h1>
+    <form action="/analyze" method="get">
+        <label for="ticker">Enter Stock Ticker:</label>
+        <input type="text" name="ticker" id="ticker" required>
+
+        <label for="start_date">Start Date:</label>
+        <input type="date" name="start_date" id="start_date" required>
+
+        <label for="end_date">End Date:</label>
+        <input type="date" name="end_date" id="end_date" required>
+
+        <button type="submit">Analyze</button>
+    </form>
+</body>
+</html>
