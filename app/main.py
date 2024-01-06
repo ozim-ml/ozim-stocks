@@ -135,5 +135,7 @@ async def analyze_ticker(
     })
 
 @app.get("/create_model", response_class=HTMLResponse)
-async def create_model(request: Request, ticker: str = Query(..., min_length=1)):
+async def create_model(
+        request: Request, ticker:
+        str = Query(..., min_length=1)):
     return templates.TemplateResponse("model.html", {"request": request, "ticker": ticker})
