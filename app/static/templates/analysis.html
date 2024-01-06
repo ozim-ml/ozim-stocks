@@ -15,6 +15,10 @@
             flex: 1;
             margin: 10px;
         }
+
+        .create-model-button {
+            padding: 15px 30px;
+            font-size: 18px;
     </style>
 </head>
 <body>
@@ -38,5 +42,10 @@
             <img src="data:image/png;base64,{{ plot_acf }}" alt="ACF of Squared Daily Returns Plot">
         </div>
     </div>
+
+    <form action="/create_model" method="get">
+        <input type="hidden" name="ticker" value="{{ ticker }}">
+        <button type="submit" class="create-model-button">Create model</button>
+    </form>
 </body>
 </html>

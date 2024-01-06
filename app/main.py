@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request, Query
 from fastapi.responses import HTMLResponse
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from io import BytesIO
@@ -132,3 +133,7 @@ async def analyze_ticker(
         "plot_daily_returns": plot_base64_daily_returns,
         "plot_acf": plot_base64_acf,
     })
+
+@app.get("/create_model", response_class=HTMLResponse)
+async def create_model(request: Request, ticker: str = Query(..., min_length=1)):
+    return templates.TemplateResponse("model.html", {"request": request, "ticker": ticker})
