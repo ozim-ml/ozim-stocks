@@ -55,10 +55,7 @@ def perform_analysis(ticker: str, start_date: str, end_date: str):
 
     plt.close()
 
-    # Plot the Daily Returns and ACF
-    plot_base64_daily_returns, plot_base64_acf = plot_daily_returns(df, ticker)
-
-    return plot_base64_adj_close, plot_base64_daily_returns, plot_base64_acf
+    return df, plot_base64_adj_close
 
 def plot_daily_returns(df, ticker):
     # Calculate daily returns
@@ -83,10 +80,7 @@ def plot_daily_returns(df, ticker):
 
     plt.close()
 
-    # Plot ACF of Squared Daily Returns
-    plot_base64_acf = plot_acf(returns, ticker)
-
-    return plot_base64_daily_returns, plot_base64_acf
+    return returns, plot_base64_daily_returns
 
 def plot_acf(returns, ticker):
     # Calculate squared returns
@@ -124,7 +118,9 @@ async def analyze_ticker(
     start_date: str = Query(..., description="Start date for analysis"),
     end_date: str = Query(..., description="End date for analysis")
 ):
-    plot_base64_adj_close, plot_base64_daily_returns, plot_base64_acf = perform_analysis(ticker, start_date, end_date)
+    df, plot_base64_adj_close = perform_analysis(ticker, start_date, end_date)
+    returns, plot_base64_daily_returns = plot_daily_returns(df, ticker)
+    plot_base64_acf = plot_acf(returns, ticker)
     return templates.TemplateResponse("analysis.html", {
         "request": request,
         "ticker": ticker,
