@@ -16,9 +16,24 @@
             margin: 10px;
         }
 
+        .create-model-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .create-model-container h2 {
+            margin-top: 0;
+        }
+
         .create-model-button {
             padding: 15px 30px;
             font-size: 18px;
+            margin-top: 5px; /* Adjust as needed */
+        }
+
+        .plot h2 {
+            margin-bottom: 5px; /* Adjust as needed */
+        }
     </style>
 </head>
 <body>
@@ -41,11 +56,13 @@
             <h2>ACF of squared daily returns</h2>
             <img src="data:image/png;base64,{{ plot_acf }}" alt="ACF of Squared Daily Returns Plot">
         </div>
-    </div>
 
-    <form action="/create_model" method="get">
-        <input type="hidden" name="ticker" value="{{ ticker }}">
-        <button type="submit" class="create-model-button">Create model</button>
-    </form>
+        <div class="plot create-model-container">
+            <form action="/create_model" method="get">
+                <h2>Forecast of volatility with GARCH(5,0,1)</h2>
+                <button type="submit" class="create-model-button">Create model</button>
+            </form>
+        </div>
+    </div>
 </body>
 </html>

@@ -8,8 +8,10 @@ import os
 
 import yfinance as yf
 import datetime as dt
-import matplotlib.pyplot as plt
 import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
+from arch import arch_model
 matplotlib.use('Agg')
 import seaborn as sns
 from statsmodels.tsa.stattools import acf
@@ -57,7 +59,11 @@ def perform_analysis(ticker: str, start_date: str, end_date: str):
 
     return df, plot_base64_adj_close
 
+
 def plot_daily_returns(df, ticker):
+
+    global returns
+
     # Calculate daily returns
     returns = 100 * df['Adj Close'].pct_change().dropna()
 
@@ -107,6 +113,36 @@ def plot_acf(returns, ticker):
 
     return plot_base64_acf
 
+def simple_model(returns):
+
+    am = arch_model(returns, vol="GARCH", p=5, o=0, q=1, dist="normal")
+    res = am.fit(update_freq=5)
+
+    horizon = 10
+    forecasts = res.forecast(horizon=horizon, method="simulation", reindex=False)
+    sims = forecasts.simulations
+
+    x = np.arange(1, horizon + 1)
+    lines = plt.plot(x, sims.residual_variances[-1, ::5].T, color="#9cb2d6", alpha=0.5)
+    lines[0].set_label("Simulated path")
+    line = plt.plot(x, forecasts.variance.iloc[-1].values, color="#002868")
+    line[0].set_label("Expected variance")
+    plt.gca().set_xticks(x)
+    plt.gca().set_xlim(1, horizon)
+    plt.legend()
+
+    # Create a BytesIO object to store the plot
+    plot_bytes_arch = BytesIO()
+
+    # Save the plot to BytesIO and encode as base64
+    plot_bytes_arch.seek(0)
+    plt.savefig(plot_bytes_arch, format='png')
+    plot_base64_arch = base64.b64encode(plot_bytes_arch.getvalue()).decode('utf-8')
+
+    plt.close()
+
+    return plot_base64_arch
+
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
@@ -116,21 +152,26 @@ async def analyze_ticker(
     request: Request,
     ticker: str = Query(..., min_length=1, description="Stock ticker"),
     start_date: str = Query(..., description="Start date for analysis"),
-    end_date: str = Query(..., description="End date for analysis")
+    end_date: str = Query(..., description="End date for analysis"),
 ):
     df, plot_base64_adj_close = perform_analysis(ticker, start_date, end_date)
     returns, plot_base64_daily_returns = plot_daily_returns(df, ticker)
     plot_base64_acf = plot_acf(returns, ticker)
+
     return templates.TemplateResponse("analysis.html", {
         "request": request,
         "ticker": ticker,
         "plot_adj_close": plot_base64_adj_close,
         "plot_daily_returns": plot_base64_daily_returns,
-        "plot_acf": plot_base64_acf,
+        "plot_acf": plot_base64_acf
     })
 
 @app.get("/create_model", response_class=HTMLResponse)
-async def create_model(
-        request: Request, ticker:
-        str = Query(..., min_length=1)):
-    return templates.TemplateResponse("model.html", {"request": request, "ticker": ticker})
+async def create_arch(
+        request: Request
+):
+    plot_base64_arch = simple_model(returns)
+    return templates.TemplateResponse("model.html", {
+        "request": request,
+        "plot_arch": plot_base64_arch
+    })

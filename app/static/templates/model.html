@@ -2,11 +2,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Stock Model</title>
+    <title>Forecast</title>
     <link rel="icon" href="{{ url_for('static', path='/images/favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
+    <style>
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .plot {
+            flex: 1;
+            margin: 10px;
+        }
+   </style>
 </head>
 <body>
-    <h1>Model for {{ ticker }}</h1>
+    <h1>Forecast of stock price volatility</h1>
+
+    <div class="container">
+        <div class="plot">
+            <h2>GARCH(5,0,1)</h2>
+            <img src="data:image/png;base64,{{ plot_arch }}" alt="ARCH Plot">
+        </div>
+    </div>
 </body>
 </html>
