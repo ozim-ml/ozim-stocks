@@ -6,35 +6,51 @@
     <link rel="icon" href="{{ url_for('static', path='/images/favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
     <style>
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-        }
+    .container {
+        display: flex;
+        flex-wrap: wrap;
+    }
 
-        .plot {
-            flex: 1;
-            margin: 10px;
-        }
+    .plot {
+        flex: 1;
+        margin: 10px;
+    }
 
-        .create-model-container {
-            display: flex;
-            flex-direction: column;
-        }
+    .create-model-container {
+        display: flex;
+        flex-direction: column;
+    }
 
-        .create-model-container h2 {
-            margin-top: 0;
-        }
+    .create-model-container h2 {
+        margin-top: 0;
+    }
 
-        .create-model-button {
-            padding: 15px 30px;
-            font-size: 18px;
-            margin-top: 5px; /* Adjust as needed */
-        }
+    .create-model-container form {
+        display: flex;
+        flex-direction: column;
+    }
 
-        .plot h2 {
-            margin-bottom: 5px; /* Adjust as needed */
-        }
-    </style>
+    .create-model-container form label {
+        margin-bottom: 5px;
+    }
+
+    .create-model-container form input {
+        padding: 8px;
+        margin-bottom: 10px;
+        width: 200px;
+    }
+
+    .create-model-button {
+        padding: 15px 30px;
+        font-size: 18px;
+        margin-top: 5px;
+    }
+
+    .plot h2 {
+        margin-bottom: 5px;
+    }
+</style>
+
 </head>
 <body>
     <h1>Stock Analysis for {{ ticker }}</h1>
@@ -59,7 +75,19 @@
 
         <div class="plot create-model-container">
             <form action="/create_model" method="get">
-                <h2>Forecast of volatility with GARCH(5,0,1)</h2>
+                <h2>Forecast of volatility with GARCH model</h2>
+                <label for="sym_in">Lag order of the symmetric innovation (p):</label>
+                <input type="number" name="sym_in" id="sym_in" required>
+
+                <label for="asym_in">Lag order of the asymmetric innovation (o):</label>
+                <input type="number" name="asym_in" id="asym_in" required>
+
+                <label for="lag_vol">Lag order of lagged volatility (q):</label>
+                <input type="number" name="lag_vol" id="lag_vol" required>
+
+                <label for="hor">Horizon of forecast:</label>
+                <input type="number" name="hor" id="hor" required>
+
                 <button type="submit" class="create-model-button">Create model</button>
             </form>
         </div>

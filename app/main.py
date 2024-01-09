@@ -113,12 +113,12 @@ def plot_acf(returns, ticker):
 
     return plot_base64_acf
 
-def simple_model(returns):
+def simple_model(returns, sym_in: int, asym_in: int, lag_vol: int, hor: int):
 
-    am = arch_model(returns, vol="GARCH", p=5, o=0, q=1, dist="normal")
+    am = arch_model(returns, vol="GARCH", p=sym_in, o=asym_in, q=lag_vol, dist="normal")
     res = am.fit(update_freq=5)
 
-    horizon = 10
+    horizon = hor
     forecasts = res.forecast(horizon=horizon, method="simulation", reindex=False)
     sims = forecasts.simulations
 
@@ -168,9 +168,13 @@ async def analyze_ticker(
 
 @app.get("/create_model", response_class=HTMLResponse)
 async def create_arch(
-        request: Request
+        request: Request,
+        sym_in: int = Query(..., description="Lag order of the symmetric innovation"),
+        asym_in: int = Query(..., description="Lag order of the asymmetric innovation"),
+        lag_vol: int = Query(..., description="Lag order of lagged volatility"),
+        hor: int = Query(..., description="Horizon of forecast")
 ):
-    plot_base64_arch = simple_model(returns)
+    plot_base64_arch = simple_model(returns, sym_in, asym_in, lag_vol, hor)
     return templates.TemplateResponse("model.html", {
         "request": request,
         "plot_arch": plot_base64_arch
