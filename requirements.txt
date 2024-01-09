@@ -3,6 +3,8 @@ uvicorn
 jinja2
 yfinance
 matplotlib
+numpy
 seaborn
 statsmodels
+arch
 
