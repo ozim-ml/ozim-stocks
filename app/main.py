@@ -32,6 +32,7 @@ templates = Jinja2Templates(directory=templates_folder)
 
 def perform_analysis(ticker: str, start_date: str, end_date: str):
     # Convert start_date and end_date to datetime objects
+
     start_date = dt.datetime.strptime(start_date, "%Y-%m-%d")
     end_date = dt.datetime.strptime(end_date, "%Y-%m-%d")
 
@@ -57,8 +58,7 @@ def perform_analysis(ticker: str, start_date: str, end_date: str):
 
     plt.close()
 
-    return df, plot_base64_adj_close
-
+    return ticker, df, plot_base64_adj_close
 
 def plot_daily_returns(df, ticker):
 
@@ -113,7 +113,7 @@ def plot_acf(returns, ticker):
 
     return plot_base64_acf
 
-def simple_model(returns, sym_in: int, asym_in: int, lag_vol: int, hor: int):
+def simple_model(ticker, returns, sym_in: int, asym_in: int, lag_vol: int, hor: int):
 
     am = arch_model(returns, vol="GARCH", p=sym_in, o=asym_in, q=lag_vol, dist="normal")
     res = am.fit(update_freq=5)
@@ -127,6 +127,7 @@ def simple_model(returns, sym_in: int, asym_in: int, lag_vol: int, hor: int):
     lines[0].set_label("Simulated path")
     line = plt.plot(x, forecasts.variance.iloc[-1].values, color="#002868")
     line[0].set_label("Expected variance")
+    plt.title(f'Simulation forecast of {ticker}')
     plt.gca().set_xticks(x)
     plt.gca().set_xlim(1, horizon)
     plt.legend()
@@ -150,11 +151,13 @@ async def read_root(request: Request):
 @app.get("/analyze", response_class=HTMLResponse)
 async def analyze_ticker(
     request: Request,
-    ticker: str = Query(..., min_length=1, description="Stock ticker"),
+    ticker_query: str = Query(..., min_length=1, description="Stock ticker"),
     start_date: str = Query(..., description="Start date for analysis"),
     end_date: str = Query(..., description="End date for analysis"),
 ):
-    df, plot_base64_adj_close = perform_analysis(ticker, start_date, end_date)
+    global ticker
+    ticker = ticker_query
+    ticker, df, plot_base64_adj_close = perform_analysis(ticker, start_date, end_date)
     returns, plot_base64_daily_returns = plot_daily_returns(df, ticker)
     plot_base64_acf = plot_acf(returns, ticker)
 
@@ -174,8 +177,13 @@ async def create_arch(
         lag_vol: int = Query(..., description="Lag order of lagged volatility"),
         hor: int = Query(..., description="Horizon of forecast")
 ):
-    plot_base64_arch = simple_model(returns, sym_in, asym_in, lag_vol, hor)
+    plot_base64_arch = simple_model(ticker, returns, sym_in, asym_in, lag_vol, hor)
     return templates.TemplateResponse("model.html", {
         "request": request,
-        "plot_arch": plot_base64_arch
+        "plot_arch": plot_base64_arch,
+        "ticker": ticker,
+        "sym_in": sym_in,
+        "asym_in": asym_in,
+        "lag_vol": lag_vol,
+        "hor": hor
     })
