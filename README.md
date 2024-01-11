@@ -1,3 +1,3 @@
 # Ozim-stocks - web app for stock price analysis and forecasting
 ## Introduction 
-Web application written in Python using the FastAPI library. The main purpose of this application is to analyse historical stock price changes and predict stock price volatility. Application is integrated with MLOps platform - MLflow.
+A web application written in Python using the FastAPI library. The application was developed to analyse historical stock price changes and predict their volatility. It is integrated with the MLOps platform - MLflow.
