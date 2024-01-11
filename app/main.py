@@ -1,3 +1,12 @@
+import subprocess
+subprocess.Popen("mlflow server --host 127.0.0.1 --port 5000")
+
+import mlflow
+
+remote_server_uri = "http://127.0.0.1:5000/"
+mlflow.set_tracking_uri(remote_server_uri)
+mlflow.set_experiment("forecast-experiment")
+
 from fastapi import FastAPI, Request, Query
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -114,14 +123,23 @@ def plot_acf(returns, ticker):
     return plot_base64_acf
 
 def simple_model(ticker, returns, sym_in: int, asym_in: int, lag_vol: int, hor: int):
+    with mlflow.start_run():
 
-    am = arch_model(returns, vol="GARCH", p=sym_in, o=asym_in, q=lag_vol, dist="normal")
-    res = am.fit(update_freq=5)
+        # Model evaluation and fitting
+        am = arch_model(returns, vol="GARCH", p=sym_in, o=asym_in, q=lag_vol, dist="normal")
+        res = am.fit(update_freq=5)
 
+        # Get logs
+        aic_model = res.aic
+        mlflow.log_param("p", sym_in)
+        mlflow.log_metric("AIC", aic_model)
+
+    # Creating simulation forecast
     horizon = hor
     forecasts = res.forecast(horizon=horizon, method="simulation", reindex=False)
     sims = forecasts.simulations
 
+    # Plotting simulation forecast
     x = np.arange(1, horizon + 1)
     lines = plt.plot(x, sims.residual_variances[-1, ::5].T, color="#9cb2d6", alpha=0.5)
     lines[0].set_label("Simulated path")
@@ -171,11 +189,11 @@ async def analyze_ticker(
 
 @app.get("/create_model", response_class=HTMLResponse)
 async def create_arch(
-        request: Request,
-        sym_in: int = Query(..., description="Lag order of the symmetric innovation"),
-        asym_in: int = Query(..., description="Lag order of the asymmetric innovation"),
-        lag_vol: int = Query(..., description="Lag order of lagged volatility"),
-        hor: int = Query(..., description="Horizon of forecast")
+    request: Request,
+    sym_in: int = Query(..., description="Lag order of the symmetric innovation"),
+    asym_in: int = Query(..., description="Lag order of the asymmetric innovation"),
+    lag_vol: int = Query(..., description="Lag order of lagged volatility"),
+    hor: int = Query(..., description="Horizon of forecast")
 ):
     plot_base64_arch = simple_model(ticker, returns, sym_in, asym_in, lag_vol, hor)
     return templates.TemplateResponse("model.html", {
