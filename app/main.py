@@ -2,10 +2,11 @@ import subprocess
 subprocess.Popen("mlflow server --host 127.0.0.1 --port 5000")
 
 import mlflow
+import mlflow.sklearn
 
 remote_server_uri = "http://127.0.0.1:5000/"
 mlflow.set_tracking_uri(remote_server_uri)
-mlflow.set_experiment("forecast-experiment")
+mlflow.set_experiment("stocks-experiment")
 
 from fastapi import FastAPI, Request, Query
 from fastapi.responses import HTMLResponse
@@ -129,10 +130,11 @@ def simple_model(ticker, returns, sym_in: int, asym_in: int, lag_vol: int, hor: 
         am = arch_model(returns, vol="GARCH", p=sym_in, o=asym_in, q=lag_vol, dist="normal")
         res = am.fit(update_freq=5)
 
-        # Get logs
-        aic_model = res.aic
         mlflow.log_param("p", sym_in)
-        mlflow.log_metric("AIC", aic_model)
+        mlflow.log_metric("AIC", res.aic)
+
+        # Provisional model logging (in order to fully log the arch model, customized function is needed)
+        mlflow.sklearn.log_model(res, "arch_models", signature=None)
 
     # Creating simulation forecast
     horizon = hor
@@ -160,7 +162,20 @@ def simple_model(ticker, returns, sym_in: int, asym_in: int, lag_vol: int, hor: 
 
     plt.close()
 
-    return plot_base64_arch
+    # Plotting simulations variances
+    sns.boxplot(data=sims.variances[-1])
+
+    # Create a BytesIO object to store the plot
+    plot_bytes_simsvar = BytesIO()
+
+    # Save the plot to BytesIO and encode as base64
+    plot_bytes_simsvar.seek(0)
+    plt.savefig(plot_bytes_simsvar, format='png')
+    plot_base64_simsvar = base64.b64encode(plot_bytes_simsvar.getvalue()).decode('utf-8')
+
+    plt.close()
+
+    return plot_base64_arch, plot_base64_simsvar
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
@@ -195,10 +210,12 @@ async def create_arch(
     lag_vol: int = Query(..., description="Lag order of lagged volatility"),
     hor: int = Query(..., description="Horizon of forecast")
 ):
-    plot_base64_arch = simple_model(ticker, returns, sym_in, asym_in, lag_vol, hor)
+    plot_base64_arch, plot_base64_simsvar = simple_model(
+        ticker, returns, sym_in, asym_in, lag_vol, hor)
     return templates.TemplateResponse("model.html", {
         "request": request,
         "plot_arch": plot_base64_arch,
+        "plot_simsvar": plot_base64_simsvar,
         "ticker": ticker,
         "sym_in": sym_in,
         "asym_in": asym_in,
