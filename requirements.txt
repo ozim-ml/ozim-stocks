@@ -7,4 +7,5 @@ numpy
 seaborn
 statsmodels
 arch
+mlflow
 
