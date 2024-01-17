@@ -1,0 +1,32 @@
+<!-- static/templates/input_arch.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Create ARCH model</title>
+    <link rel="icon" href="{{ url_for('static', path='/images/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
+</head>
+<body>
+    <h1>Stock analysis</h1>
+    <div class="plot create-model-container">
+    <form action="/vis_arch" method="get">
+                <h2>Forecast of volatility with GARCH model</h2>
+                <label for="sym_in">Lag order of the symmetric innovation (p):</label>
+                <input type="number" name="sym_in" id="sym_in" required>
+
+                <label for="asym_in">Lag order of the asymmetric innovation (o):</label>
+                <input type="number" name="asym_in" id="asym_in" required>
+
+                <label for="lag_vol">Lag order of lagged volatility (q):</label>
+                <input type="number" name="lag_vol" id="lag_vol" required>
+
+                <label for="hor">Horizon of forecast:</label>
+                <input type="number" name="hor" id="hor" required>
+
+                <button type="submit" class="create-model-button">Create model</button>
+            </form>
+        </div>
+
+</body>
+</html>
+

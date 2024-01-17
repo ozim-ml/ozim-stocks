@@ -1,0 +1,35 @@
+<!-- static/templates/vis_arch.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Forecast</title>
+    <link rel="icon" href="{{ url_for('static', path='/images/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
+    <style>
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .plot {
+            flex: 1;
+            margin: 10px;
+        }
+   </style>
+</head>
+<body>
+    <h1>Forecast of {{ ticker }} volatility</h1>
+
+    <div class="container">
+        <div class="plot">
+            <h2>GARCH({{ sym_in }},{{ asym_in }},{{ lag_vol }})</h2>
+            <img src="data:image/png;base64,{{ plot_arch }}" alt="ARCH Plot">
+        </div>
+
+        <div class="plot">
+            <h2>Simulations variances</h2>
+            <img src="data:image/png;base64,{{ plot_simsvar }}" alt="Simulations variances plot">
+        </div>
+    </div>
+</body>
+</html>
