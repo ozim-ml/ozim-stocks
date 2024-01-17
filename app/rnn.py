@@ -1,7 +1,7 @@
 from app.main import *
 from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras import Sequential
-from tensorflow.keras.layers import Dense, LSTM
+from tensorflow.keras.layers import Dense, LSTM, Dropout
 
 def perform_lstm(df, ticker):
 
