@@ -1,5 +1,6 @@
 from app.main import *
 from sklearn.preprocessing import MinMaxScaler
+import tensorflow as tf
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense, LSTM, Dropout
 
@@ -61,7 +62,9 @@ def perform_lstm(df, ticker):
     predictions = model.predict(x_test)
     predictions = scaler.inverse_transform(predictions)
 
+    mean = np.mean(y_test)
     rmse = np.sqrt(np.mean(((predictions - y_test) ** 2)))
+    cv_rmse = rmse/mean
 
     train = df_adj[:train_len]
     valid = df_adj[train_len:]
