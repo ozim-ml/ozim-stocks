@@ -59,19 +59,23 @@ async def basic_plots(
     ticker = ticker_query
     ticker, df, plot_base64_adj_close = perform_analysis(ticker, start_date, end_date)
     returns, plot_base64_daily_returns = plot_daily_returns(df, ticker)
-    plot_base64_acf = plot_acf(returns, ticker)
+    plot_base64_risk_return = plot_risk_ret(returns, ticker)
 
     return templates.TemplateResponse("analysis.html", {
         "request": request,
         "ticker": ticker,
         "plot_adj_close": plot_base64_adj_close,
         "plot_daily_returns": plot_base64_daily_returns,
-        "plot_acf": plot_base64_acf
+        "plot_risk_ret": plot_base64_risk_return
     })
 
 @app.get("/input_arch", response_class=HTMLResponse)
 async def input_arch(request: Request):
-    return templates.TemplateResponse("input_arch.html", {"request": request})
+    plot_base64_acf = plot_acf(returns, ticker)
+    return templates.TemplateResponse("input_arch.html", {
+        "request": request,
+        "plot_acf": plot_base64_acf
+    })
 
 @app.get("/vis_lstm", response_class=HTMLResponse)
 async def vis_lstm(request: Request):

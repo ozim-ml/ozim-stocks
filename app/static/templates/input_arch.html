@@ -1,4 +1,3 @@
-<!-- static/templates/input_arch.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,26 +6,33 @@
     <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
 </head>
 <body>
-    <h1>Stock analysis</h1>
-    <div class="plot create-model-container">
-    <form action="/vis_arch" method="get">
-                <h2>Forecast of volatility with GARCH model</h2>
-                <label for="sym_in">Lag order of the symmetric innovation (p):</label>
-                <input type="number" name="sym_in" id="sym_in" required>
+    <div class="container">
+        <div class="plot-container">
+            <div class="plot">
+                <h1>Stock Analysis for {{ ticker }}</h1>
+                <h2>ACF of squared returns</h2>
+                <img src="data:image/png;base64,{{ plot_acf }}" alt="ACF Plot">
+            </div>
+            <div class="input-container">
+                <form action="/vis_arch" method="get">
+                    <h2>Forecast of volatility with GARCH model</h2>
 
-                <label for="asym_in">Lag order of the asymmetric innovation (o):</label>
-                <input type="number" name="asym_in" id="asym_in" required>
+                    <label for="sym_in">Lag order of the symmetric innovation (p):</label>
+                    <input type="number" name="sym_in" id="sym_in" required>
 
-                <label for="lag_vol">Lag order of lagged volatility (q):</label>
-                <input type="number" name="lag_vol" id="lag_vol" required>
+                    <label for="asym_in">Lag order of the asymmetric innovation (o):</label>
+                    <input type="number" name="asym_in" id="asym_in" required>
 
-                <label for="hor">Horizon of forecast:</label>
-                <input type="number" name="hor" id="hor" required>
+                    <label for="lag_vol">Lag order of lagged volatility (q):</label>
+                    <input type="number" name="lag_vol" id="lag_vol" required>
 
-                <button type="submit" class="create-model-button">Create model</button>
-            </form>
+                    <label for="hor">Horizon of forecast:</label>
+                    <input type="number" name="hor" id="hor" required>
+
+                    <button type="submit" class="create-model-button">Create model</button>
+                </form>
+            </div>
         </div>
-
+    </div>
 </body>
 </html>
-

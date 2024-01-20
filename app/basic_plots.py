@@ -68,6 +68,7 @@ def plot_acf(returns, ticker):
     plt.xlabel('Lag')
     plt.ylabel('Autocorrelation')
     plt.title(f'ACF of squared daily returns of {ticker}')
+    plt.tight_layout()
 
     # Create a BytesIO object to store the plot
     plot_bytes_acf = BytesIO()
@@ -80,3 +81,36 @@ def plot_acf(returns, ticker):
     plt.close()
 
     return plot_base64_acf
+
+def plot_risk_ret(returns, ticker):
+
+    area = np.pi * 20
+
+    plt.scatter(returns.mean(), returns.std(), s=area)
+    plt.xlabel('Expected return')
+    plt.ylabel('Risk')
+    plt.title(f'Risk-return of {ticker}')
+    plt.tight_layout()
+
+    for _, value in returns.items():
+        x = returns.mean()
+        y = returns.std()
+        plt.annotate(
+            ticker, xy=(x, y), xytext=(50, 50), textcoords='offset points',
+            ha='right', va='bottom',
+            arrowprops=dict(arrowstyle='-', color='blue', connectionstyle='arc3,rad=-0.3')
+        )
+
+    # Create a BytesIO object to store the plot
+    plot_bytes_risk_ret = BytesIO()
+
+    # Save the plot to BytesIO and encode as base64
+    plot_bytes_risk_ret.seek(0)
+    plt.savefig(plot_bytes_risk_ret, format='png')
+    plot_base64_risk_ret = base64.b64encode(plot_bytes_risk_ret.getvalue()).decode('utf-8')
+
+    plt.close()
+
+    return plot_base64_risk_ret
+
+
