@@ -4,6 +4,8 @@ import tensorflow as tf
 from tensorflow.keras import Sequential
 from tensorflow.keras.layers import Dense, LSTM, Dropout
 
+mlflow.set_experiment("stocks-lstm")
+
 def perform_lstm(df, ticker):
 
     tf.random.set_seed(1)
@@ -42,29 +44,35 @@ def perform_lstm(df, ticker):
     model.add(Dense(1))
     model.add(Dropout(0.2))
 
-    model.compile(optimizer='adam', loss='mean_squared_error')
+    model.compile(optimizer='adam', loss='mean_squared_error', metrics='MAE')
 
     batch_size = 16
     epochs = 10
 
-    model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs)
+    with mlflow.start_run():
 
-    test_data = scaled_data[train_len - interval:, :]
-    x_test = []
-    y_test = lstm_df[train_len:, :]
+        mlflow.tensorflow.autolog()
 
-    for i in range(interval, len(test_data)):
-        x_test.append(test_data[i - interval:i, 0])
+        model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs)
 
-    x_test = np.array(x_test)
-    x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
+        test_data = scaled_data[train_len - interval:, :]
+        x_test = []
+        y_test = lstm_df[train_len:, :]
 
-    predictions = model.predict(x_test)
-    predictions = scaler.inverse_transform(predictions)
+        for i in range(interval, len(test_data)):
+            x_test.append(test_data[i - interval:i, 0])
 
-    mean = np.mean(y_test)
-    rmse = np.sqrt(np.mean(((predictions - y_test) ** 2)))
-    cv_rmse = rmse/mean
+        x_test = np.array(x_test)
+        x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
+
+        predictions = model.predict(x_test)
+        predictions = scaler.inverse_transform(predictions)
+
+        mean = np.mean(y_test)
+        rmse = np.sqrt(np.mean(((predictions - y_test) ** 2)))
+        cv_rmse = rmse/mean
+
+        mlflow.log_metric('CV RMSE', cv_rmse)
 
     train = df_adj[:train_len]
     valid = df_adj[train_len:]

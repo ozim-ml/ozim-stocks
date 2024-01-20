@@ -1,5 +1,7 @@
 from app.main import *
 
+mlflow.set_experiment("stocks-arch")
+
 def eval_arch(ticker, returns, sym_in: int, asym_in: int, lag_vol: int, hor: int):
     with mlflow.start_run():
 

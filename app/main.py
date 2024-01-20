@@ -3,10 +3,10 @@ subprocess.Popen("mlflow server --host 127.0.0.1 --port 5000")
 
 import mlflow
 import mlflow.sklearn
+import mlflow.tensorflow
 
 remote_server_uri = "http://127.0.0.1:5000/"
 mlflow.set_tracking_uri(remote_server_uri)
-mlflow.set_experiment("stocks-experiment")
 
 from fastapi import FastAPI, Request, Query
 from fastapi.responses import HTMLResponse
