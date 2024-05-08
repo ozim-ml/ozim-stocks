@@ -74,6 +74,16 @@ async def input_arch(request: Request):
         "plot_acf": plot_base64_acf
     })
 
+@app.get("/input_lstm", response_class=HTMLResponse)
+async def input_lstm(
+    request: Request,
+    t_steps: int = Query(..., description="Time steps"),
+    fcst_steps: int = Query(..., description="Forecast steps"),
+):
+    return templates.TemplateResponse("input_lstm.html", {
+        "request": request
+    })
+
 @app.get("/vis_lstm", response_class=HTMLResponse)
 async def vis_lstm(request: Request):
     plot_base64_lstm = perform_lstm(stock_df, ticker)

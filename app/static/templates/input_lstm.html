@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Create LSTM model</title>
+    <link rel="icon" href="{{ url_for('static', path='/images/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
+</head>
+<body>
+    <div class="input-container">
+        <form action="/vis_arch" method="get">
+            <h2>Forecast of Close price with LSTM model</h2>
+
+            <label for="t_steps">Time steps:</label>
+            <input type="number" name="t_steps" id="t_steps" required>
+
+            <label for="fcst_steps">Forecast steps:</label>
+            <input type="number" name="fcst_steps" id="fcst_steps" required>
+
+            <button type="submit" class="create-model-button">Create model</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,6 +1,4 @@
 from app.main import *
-
-import yfinance as yf
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
@@ -15,7 +13,11 @@ from datetime import datetime
 
 # mlflow.set_experiment("stocks-lstm")
 
-def perform_lstm(stock_df, ticker):
+def perform_lstm(stock_df,
+                 ticker, 
+                 t_steps: int, 
+                 fcst_steps: int
+                 ):
 
     features = stock_df[['High', 'Low', 'Volume']].values
     target = stock_df['Close'].values.reshape(-1, 1)
@@ -32,7 +34,7 @@ def perform_lstm(stock_df, ticker):
             Y.append(target[i + time_steps])
         return np.array(X), np.array(Y)
 
-    time_steps = 30
+    time_steps = t_steps
     X, Y = create_lstm_data(features_scaled, target_scaled, time_steps)
 
     model = Sequential([
@@ -50,7 +52,7 @@ def perform_lstm(stock_df, ticker):
     last_inputs = features_scaled[-time_steps:]
     future_data = []
     
-    forecast_steps = 30
+    forecast_steps = fcst_steps
     
     for _ in range(forecast_steps):  
         last_input = np.array([last_inputs])
