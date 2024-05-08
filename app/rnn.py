@@ -11,6 +11,7 @@ from keras.callbacks import EarlyStopping
 import matplotlib.pyplot as plt
 import seaborn as sns
 import datetime as dt
+from datetime import datetime
 
 # mlflow.set_experiment("stocks-lstm")
 
@@ -60,47 +61,36 @@ def perform_lstm(stock_df, ticker):
 
     future_data = scaler_target.inverse_transform(np.array(future_data).reshape(-1, 1))
 
+
     historical_data = stock_df[['Close']].tail(60)
 
+    future_indices = range(1, 1 + len(future_data))  
     future_df = pd.DataFrame(future_data, columns=['Close'], index=future_indices)
-    
-    full_data_df = pd.concat([
-        historical_data.set_index(historical_data.index.astype(str)),  
-        future_df.set_index(future_df.index.astype(str))  
-    ])
-    
-    formatted_historical_labels = [datetime.strptime(label, '%Y-%m-%d %H:%M:%S%z').strftime('%Y-%m-%d %H:%M') 
-                                   if '+' in label else label for label in historical_data.index.astype(str)]
-    
-    plt.figure(figsize=(14, 6))
+
+    formatted_historical_labels = [datetime.strptime(label, '%Y-%m-%d %H:%M:%S%z').strftime('%Y-%m-%d %H:%M') if '+' in label 
+                                   else label for label in historical_data.index.astype(str)]
+
+    plt.figure(figsize=(14, 7))
     plt.plot(formatted_historical_labels, historical_data['Close'], marker='o', label='Historical Data')
     plt.plot(future_df.index.astype(str), future_df['Close'], marker='o', color='orange', label='Forecasted Data')
-    
+
     plt.title('Historical and Predicted Stock Prices')
     plt.xlabel('Data Points')
     plt.ylabel('Stock Price')
-    plt.grid(linestyle='--')
+    plt.grid(True)
     plt.legend()
-    
+
     all_labels = formatted_historical_labels + list(future_df.index.astype(str))
     label_step = 5
-    visible_labels = all_labels[::label_step] 
-    plt.xticks(range(len(all_labels))[::label_step], visible_labels, rotation=45)  
+    visible_labels = all_labels[::label_step]  
+    plt.xticks(range(len(all_labels))[::label_step], visible_labels, rotation=45) 
+    plt.tight_layout()   
     
-    plt.tight_layout()  
-    
-    # Create a BytesIO object to store the plot
     plot_bytes_lstm = BytesIO()
-
-    # Save the plot to BytesIO and encode as base64
     plot_bytes_lstm.seek(0)
     plt.savefig(plot_bytes_lstm, format='png')
     plot_base64_lstm = base64.b64encode(plot_bytes_lstm.getvalue()).decode('utf-8')
-
+    
     plt.close()
 
     return plot_base64_lstm
-
-
-
-
