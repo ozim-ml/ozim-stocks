@@ -7,10 +7,10 @@ def perform_analysis(ticker: str, start_date: str, end_date: str):
     end_date = dt.datetime.strptime(end_date, "%Y-%m-%d")
 
     # Load data from yfinance for selected tickers within the specified date range
-    df = yf.download(ticker, start=start_date, end=end_date)
+    stock_df = yf.download(ticker, start=start_date, end=end_date)
 
     # Plot the Adjusted Closing Price
-    plt.plot(df.index, df['Adj Close'], label='Adj Close', linewidth=1.5)
+    plt.plot(stock_df.index, stock_df['Adj Close'], label='Adj Close', linewidth=1.5)
     plt.title(f'Adj Close of {ticker}')
     plt.xlabel(None)
     plt.ylabel('Adj Close Price')
@@ -28,12 +28,12 @@ def perform_analysis(ticker: str, start_date: str, end_date: str):
 
     plt.close()
 
-    return ticker, df, plot_base64_adj_close
+    return ticker, stock_df, plot_base64_adj_close
 
-def plot_daily_returns(df, ticker):
+def plot_daily_returns(stock_df, ticker):
 
     # Calculate daily returns
-    returns = 100 * df['Adj Close'].pct_change().dropna()
+    returns = 100 * stock_df['Adj Close'].pct_change().dropna()
 
     # Plot the daily returns
     plt.plot(returns.index, returns, label='Daily return', linewidth=1.5)
