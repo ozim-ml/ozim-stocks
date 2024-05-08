@@ -51,11 +51,10 @@ def perform_lstm(stock_df, ticker):
     
     forecast_steps = 30
     
-    for _ in range(forecast_steps):  # Number of steps to forecast
+    for _ in range(forecast_steps):  
         last_input = np.array([last_inputs])
         next_price_scaled = model.predict(last_input)
         future_data.append(next_price_scaled[0][0])
-        # Update the last_inputs with the new prediction
         new_row = [[last_inputs[-1, 0], last_inputs[-1, 1], next_price_scaled[0][0]]]
         last_inputs = np.vstack([last_inputs, new_row])[1:]
 
@@ -85,7 +84,7 @@ def perform_lstm(stock_df, ticker):
     
     all_labels = formatted_historical_labels + list(future_df.index.astype(str))
     label_step = 5
-    visible_labels = all_labels[::label_step]  # Select every 5th label
+    visible_labels = all_labels[::label_step] 
     plt.xticks(range(len(all_labels))[::label_step], visible_labels, rotation=45)  
     
     plt.tight_layout()  
