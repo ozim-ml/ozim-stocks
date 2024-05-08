@@ -55,10 +55,10 @@ async def basic_plots(
     start_date: str = Query(..., description="Start date for analysis"),
     end_date: str = Query(..., description="End date for analysis"),
 ):
-    global ticker, df, returns
+    global ticker, stock_df, returns
     ticker = ticker_query
-    ticker, df, plot_base64_adj_close = perform_analysis(ticker, start_date, end_date)
-    returns, plot_base64_daily_returns = plot_daily_returns(df, ticker)
+    ticker, stock_df, plot_base64_adj_close = perform_analysis(ticker, start_date, end_date)
+    returns, plot_base64_daily_returns = plot_daily_returns(stock_df, ticker)
     plot_base64_risk_return = plot_risk_ret(returns, ticker)
 
     return templates.TemplateResponse("analysis.html", {
@@ -79,7 +79,7 @@ async def input_arch(request: Request):
 
 @app.get("/vis_lstm", response_class=HTMLResponse)
 async def vis_lstm(request: Request):
-    plot_base64_lstm = perform_lstm(df, ticker)
+    plot_base64_lstm = perform_lstm(stock_df, ticker)
     return templates.TemplateResponse("vis_rnn.html", {
         "request": request,
         "plot_lstm": plot_base64_lstm
