@@ -26,9 +26,6 @@ matplotlib.use('Agg')
 import seaborn as sns
 from statsmodels.tsa.stattools import acf
 
-sns.set_style('whitegrid')
-plt.style.use("fivethirtyeight")
-
 yf.pdr_override()
 
 app = FastAPI()
