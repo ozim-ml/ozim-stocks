@@ -74,24 +74,6 @@ async def input_arch(request: Request):
         "plot_acf": plot_base64_acf
     })
 
-@app.get("/input_lstm", response_class=HTMLResponse)
-async def input_lstm(
-    request: Request,
-    t_steps: int = Query(..., description="Time steps"),
-    fcst_steps: int = Query(..., description="Forecast steps"),
-):
-    return templates.TemplateResponse("input_lstm.html", {
-        "request": request
-    })
-
-@app.get("/vis_lstm", response_class=HTMLResponse)
-async def vis_lstm(request: Request):
-    plot_base64_lstm = perform_lstm(stock_df, ticker)
-    return templates.TemplateResponse("vis_rnn.html", {
-        "request": request,
-        "plot_lstm": plot_base64_lstm
-    })
-
 @app.get("/vis_arch", response_class=HTMLResponse)
 async def vis_arch(
     request: Request,
@@ -111,4 +93,27 @@ async def vis_arch(
         "asym_in": asym_in,
         "lag_vol": lag_vol,
         "hor": hor
+    })
+
+@app.get("/input_lstm", response_class=HTMLResponse)
+async def input_lstm(
+    request: Request
+    ):
+    return templates.TemplateResponse("input_lstm.html", {
+        "request": request
+    })
+
+@app.get("/vis_lstm", response_class=HTMLResponse)
+async def vis_lstm(
+    request: Request,
+    t_steps: int = Query(..., description="Time steps"),
+    fcst_steps: int = Query(..., description="Forecast steps"),               
+):
+    plot_base64_lstm = perform_lstm(stock_df, ticker)
+    return templates.TemplateResponse("vis_rnn.html", {
+        "request": request,
+        "plot_lstm": plot_base64_lstm,
+        "ticker": ticker,
+        "t_steps": t_steps,
+        "fcst_steps": fcst_steps
     })
