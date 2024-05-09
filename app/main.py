@@ -109,7 +109,7 @@ async def vis_lstm(
     t_steps: int = Query(..., description="Time steps"),
     fcst_steps: int = Query(..., description="Forecast steps"),               
 ):
-    plot_base64_lstm = perform_lstm(stock_df, ticker)
+    plot_base64_lstm = perform_lstm(stock_df, ticker, t_steps, fcst_steps)
     return templates.TemplateResponse("vis_rnn.html", {
         "request": request,
         "plot_lstm": plot_base64_lstm,
