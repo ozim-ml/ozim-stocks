@@ -1,3 +1,5 @@
+# main.py
+
 import subprocess
 subprocess.Popen("mlflow server --host 127.0.0.1 --port 5000")
 
@@ -107,10 +109,10 @@ async def input_lstm(
 async def vis_lstm(
     request: Request,
     t_steps: int = Query(..., description="Time steps"),
-    fcst_steps: int = Query(..., description="Forecast steps"),               
+    fcst_steps: int = Query(..., description="Forecast steps")               
 ):
     plot_base64_lstm = perform_lstm(stock_df, ticker, t_steps, fcst_steps)
-    return templates.TemplateResponse("vis_rnn.html", {
+    return templates.TemplateResponse("vis_lstm.html", {
         "request": request,
         "plot_lstm": plot_base64_lstm,
         "ticker": ticker,
