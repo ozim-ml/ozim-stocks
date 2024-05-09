@@ -109,13 +109,15 @@ async def input_lstm(
 async def vis_lstm(
     request: Request,
     t_steps: int = Query(..., description="Time steps"),
-    fcst_steps: int = Query(..., description="Forecast steps")               
+    fcst_steps: int = Query(..., description="Forecast steps"),
+    epoch_val: int = Query(..., description="Epochs"),            
 ):
-    plot_base64_lstm = perform_lstm(stock_df, ticker, t_steps, fcst_steps)
+    plot_base64_lstm = perform_lstm(stock_df, ticker, t_steps, fcst_steps, epoch_val)
     return templates.TemplateResponse("vis_lstm.html", {
         "request": request,
         "plot_lstm": plot_base64_lstm,
         "ticker": ticker,
         "t_steps": t_steps,
-        "fcst_steps": fcst_steps
+        "fcst_steps": fcst_steps,
+        "epoch_val": epoch_val
     })

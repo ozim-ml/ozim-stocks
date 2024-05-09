@@ -18,7 +18,8 @@ from datetime import datetime
 def perform_lstm(stock_df,
                  ticker, 
                  t_steps: int, 
-                 fcst_steps: int
+                 fcst_steps: int,
+                 epoch_val: int
                  ):
 
     features = stock_df[['High', 'Low', 'Volume']].values
@@ -49,7 +50,7 @@ def perform_lstm(stock_df,
     model.summary()
     early_stop = EarlyStopping(monitor = 'loss', patience = 2)
     model.compile(optimizer='adam', loss='mean_squared_error')
-    model.fit(X, Y, epochs=50, batch_size=32, callbacks=[early_stop])
+    model.fit(X, Y, epochs=epoch_val, batch_size=32, callbacks=[early_stop])
 
     last_inputs = features_scaled[-time_steps:]
     future_data = []
@@ -78,7 +79,7 @@ def perform_lstm(stock_df,
     plt.plot(formatted_historical_labels, historical_data['Close'], marker='o', label='Historical Data')
     plt.plot(future_df.index.astype(str), future_df['Close'], marker='o', color='orange', label='Forecasted Data')
 
-    plt.title('Historical and Predicted Stock Prices')
+    plt.title(f'Historical and Predicted Stock Prices of {ticker}')
     plt.xlabel('Data Points')
     plt.ylabel('Stock Price')
     plt.grid(True)
