@@ -1,3 +1,5 @@
+# main.py
+
 import subprocess
 subprocess.Popen("mlflow server --host 127.0.0.1 --port 5000")
 
@@ -74,24 +76,6 @@ async def input_arch(request: Request):
         "plot_acf": plot_base64_acf
     })
 
-@app.get("/input_lstm", response_class=HTMLResponse)
-async def input_lstm(
-    request: Request,
-    t_steps: int = Query(..., description="Time steps"),
-    fcst_steps: int = Query(..., description="Forecast steps"),
-):
-    return templates.TemplateResponse("input_lstm.html", {
-        "request": request
-    })
-
-@app.get("/vis_lstm", response_class=HTMLResponse)
-async def vis_lstm(request: Request):
-    plot_base64_lstm = perform_lstm(stock_df, ticker)
-    return templates.TemplateResponse("vis_rnn.html", {
-        "request": request,
-        "plot_lstm": plot_base64_lstm
-    })
-
 @app.get("/vis_arch", response_class=HTMLResponse)
 async def vis_arch(
     request: Request,
@@ -111,4 +95,29 @@ async def vis_arch(
         "asym_in": asym_in,
         "lag_vol": lag_vol,
         "hor": hor
+    })
+
+@app.get("/input_lstm", response_class=HTMLResponse)
+async def input_lstm(
+    request: Request
+    ):
+    return templates.TemplateResponse("input_lstm.html", {
+        "request": request
+    })
+
+@app.get("/vis_lstm", response_class=HTMLResponse)
+async def vis_lstm(
+    request: Request,
+    t_steps: int = Query(..., description="Time steps"),
+    fcst_steps: int = Query(..., description="Forecast steps"),
+    epoch_val: int = Query(..., description="Epochs"),            
+):
+    plot_base64_lstm = perform_lstm(stock_df, ticker, t_steps, fcst_steps, epoch_val)
+    return templates.TemplateResponse("vis_lstm.html", {
+        "request": request,
+        "plot_lstm": plot_base64_lstm,
+        "ticker": ticker,
+        "t_steps": t_steps,
+        "fcst_steps": fcst_steps,
+        "epoch_val": epoch_val
     })

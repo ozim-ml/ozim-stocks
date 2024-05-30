@@ -1,22 +1,45 @@
+<!-- static/templates/input_lstm.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Create LSTM model</title>
     <link rel="icon" href="{{ url_for('static', path='/images/favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', path='scripts/epoch.js') }}"></script>
+    <style>
+        .progress-bar {
+            width: 100%;
+            background-color: #f1f1f1;
+        }
+        .progress {
+            width: 0%;
+            height: 30px;
+            background-color: #4caf50;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+        }
+    </style>
 </head>
 <body>
     <div class="input-container">
-        <form action="/vis_arch" method="get">
-            <h2>Forecast of Close price with LSTM model</h2>
+        <form id="lstm-form" action="/vis_lstm" method="get">
+            <h2>Select LSTM and forecast parameters</h2>
 
-            <label for="t_steps">Time steps:</label>
+            <label for="t_steps">Time steps:</label>  
             <input type="number" name="t_steps" id="t_steps" required>
 
             <label for="fcst_steps">Forecast steps:</label>
             <input type="number" name="fcst_steps" id="fcst_steps" required>
 
-            <button type="submit" class="create-model-button">Create model</button>
+            <label for="epoch_val">Epochs:</label>
+            <input type="number" name="epoch_val" id="epoch_val" required>
+
+            <button type="button" id="create-model-button" class="create-model-button">Create model</button>
+            <div class="progress-bar">
+                <div class="progress">0%</div>
+            </div>
         </form>
     </div>
 </body>

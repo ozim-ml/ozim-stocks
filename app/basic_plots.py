@@ -1,3 +1,5 @@
+#basic_plots.py
+
 from app.main import *
 
 def perform_analysis(ticker: str, start_date: str, end_date: str):
